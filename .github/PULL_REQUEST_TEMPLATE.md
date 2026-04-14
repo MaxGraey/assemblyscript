@@ -14,14 +14,14 @@ Changes proposed in this pull request:
 - [ ] This PR was AI-assisted
 
   <details>
-  <summary>If yes, you can optionally add more details.</summary>
-
+  <summary>If yes, you can optionally add more details:</summary></br>
+  
   - [ ] AI was used for `code`
   - [ ] AI was used for `tests`
   - [ ] AI was used for `documentation`
   - [ ] AI was used for `PR` or `commit` text
   - [ ] Other (describe how it was used)
-
+  ---
   **LLM model:**
   <!-- Example:
     Claude Opus 4.6
