@@ -326,7 +326,7 @@ export class Options {
   setFeature(feature: Feature, on: bool = true): void {
     if (on) {
       // Enabling Stringref also enables GC
-      if (feature & Feature.Stringref) feature |= Feature.GC;
+      if (feature & Feature.Strings) feature |= Feature.GC;
       // Enabling GC also enables Reference Types
       if (feature & Feature.GC) feature |= Feature.ReferenceTypes;
       // Enabling Relaxed SIMD also enables SIMD
@@ -336,7 +336,7 @@ export class Options {
       // Disabling Reference Types also disables GC
       if (feature & Feature.ReferenceTypes) feature |= Feature.GC;
       // Disabling GC also disables Stringref
-      if (feature & Feature.GC) feature |= Feature.Stringref;
+      if (feature & Feature.GC) feature |= Feature.Strings;
       // Disabling SIMD also disables Relaxed SIMD
       if (feature & Feature.Simd) feature |= Feature.RelaxedSimd;
       this.features &= ~feature;
@@ -515,7 +515,7 @@ export class Compiler extends DiagnosticEmitter {
     if (options.hasFeature(Feature.Memory64)) featureFlags |= FeatureFlags.Memory64;
     if (options.hasFeature(Feature.RelaxedSimd)) featureFlags |= FeatureFlags.RelaxedSIMD;
     if (options.hasFeature(Feature.ExtendedConst)) featureFlags |= FeatureFlags.ExtendedConst;
-    if (options.hasFeature(Feature.Stringref)) featureFlags |= FeatureFlags.Stringref;
+    if (options.hasFeature(Feature.Strings)) featureFlags |= FeatureFlags.Strings;
     module.setFeatures(featureFlags);
 
     // set up the main start function

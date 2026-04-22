@@ -33,7 +33,7 @@ export const enum Feature {
   /** Extended const expressions. */
   ExtendedConst = 1 << 13, // see: https://github.com/WebAssembly/extended-const
   /** Reference typed strings. */
-  Stringref = 1 << 14, // see: https://github.com/WebAssembly/stringref
+  Strings = 1 << 14, // see: https://github.com/WebAssembly/stringref
   /** All features. */
   All = (1 << 15) - 1
 }
@@ -55,7 +55,7 @@ export function featureToString(feature: Feature): string {
     case Feature.Memory64: return "memory64";
     case Feature.RelaxedSimd: return "relaxed-simd";
     case Feature.ExtendedConst: return "extended-const";
-    case Feature.Stringref: return "stringref";
+    case Feature.Strings: return "stringref";
   }
   assert(false);
   return "";

@@ -210,7 +210,7 @@ export const enum FeatureFlags {
   Memory64 = 2048 /* _BinaryenFeatureMemory64 */,
   RelaxedSIMD = 4096 /* _BinaryenFeatureRelaxedSIMD */,
   ExtendedConst = 8192 /* _BinaryenFeatureExtendedConst */,
-  Stringref = 16384 /* _BinaryenFeatureStrings */,
+  Strings = 16384 /* _BinaryenFeatureStrings */,
   MultiMemory = 32768 /* _BinaryenFeatureMultiMemory */,
   StackSwitching = 65536 /* _BinaryenFeatureStackSwitching */,
   SharedEverything = 131072 /* _BinaryenFeatureSharedEverything */,
@@ -2689,6 +2689,12 @@ export class Module {
         passes.push("gufa-optimizing");
         passes.push("dae-optimizing");
       }
+      if (this.getFeatures() & FeatureFlags.MultiValue) {
+        // Optimize tuples before local opts (as splitting tuples can help local
+        // opts), but also not too early, as we want to be after
+        // optimize-instructions at least (which can remove tuple-related things).
+        passes.push("tuple-optimization");
+      }
       if (optimizeLevel >= 3) {
         passes.push("simplify-locals-nostructure");
         passes.push("flatten");
@@ -2821,6 +2827,12 @@ export class Module {
         passes.push("remove-unused-names");
         passes.push("merge-blocks");
         passes.push("vacuum");
+
+        if (this.getFeatures() & FeatureFlags.Strings) {
+          // Gather strings to globals right before reorder-globals, which will then
+          // sort them properly.
+          passes.push("string-gathering");
+        }
 
         passes.push("simplify-globals-optimizing");
         passes.push("reorder-globals");

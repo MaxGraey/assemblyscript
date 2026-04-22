@@ -390,9 +390,9 @@ export namespace OperatorKind {
       case Token.GreaterThan_GreaterThan_Equals: return OperatorKind.BitwiseShr;
       case Token.GreaterThan_GreaterThan_GreaterThan:
       case Token.GreaterThan_GreaterThan_GreaterThan_Equals: return OperatorKind.BitwiseShrU;
-      case Token.Equals_Equals: 
+      case Token.Equals_Equals:
       case Token.Equals_Equals_Equals: return OperatorKind.Eq;
-      case Token.Exclamation_Equals: 
+      case Token.Exclamation_Equals:
       case Token.Exclamation_Equals_Equals: return OperatorKind.Ne;
       case Token.GreaterThan: return OperatorKind.Gt;
       case Token.GreaterThan_Equals: return OperatorKind.Ge;
@@ -436,7 +436,7 @@ export class Program extends DiagnosticEmitter {
     diagnostics: DiagnosticMessage[] | null = null
   ) {
     super(diagnostics);
-    this.module = Module.create(options.stackSize > 0, options.sizeTypeRef);    
+    this.module = Module.create(options.stackSize > 0, options.sizeTypeRef);
     this.parser = new Parser(this.diagnostics, this.sources);
     this.resolver = new Resolver(this);
     let nativeFile = new File(this, Source.native);
@@ -1085,7 +1085,7 @@ export class Program extends DiagnosticEmitter {
     this.registerConstantInteger(CommonNames.ASC_FEATURE_EXTENDED_CONST, Type.bool,
       i64_new(options.hasFeature(Feature.ExtendedConst) ? 1 : 0, 0));
     this.registerConstantInteger(CommonNames.ASC_FEATURE_STRINGREF, Type.bool,
-      i64_new(options.hasFeature(Feature.Stringref) ? 1 : 0, 0));
+      i64_new(options.hasFeature(Feature.Strings) ? 1 : 0, 0));
 
     // remember deferred elements
     let queuedImports = new Array<QueuedImport>();
@@ -1300,7 +1300,7 @@ export class Program extends DiagnosticEmitter {
         this.registerWrapperClass(Type.array, CommonNames.RefArray);
         this.registerWrapperClass(Type.i31, CommonNames.RefI31);
       }
-      if (options.hasFeature(Feature.Stringref)) {
+      if (options.hasFeature(Feature.Strings)) {
         this.registerWrapperClass(Type.string, CommonNames.RefString);
       }
     }
@@ -1974,7 +1974,7 @@ export class Program extends DiagnosticEmitter {
       case TypeKind.StringviewWTF16:
       case TypeKind.StringviewIter: {
         return this.checkFeatureEnabled(Feature.ReferenceTypes, reportNode)
-            && this.checkFeatureEnabled(Feature.Stringref, reportNode);
+            && this.checkFeatureEnabled(Feature.Strings, reportNode);
       }
     }
     let classReference = type.getClass();
