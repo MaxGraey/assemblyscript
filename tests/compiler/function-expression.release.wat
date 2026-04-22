@@ -1171,12 +1171,12 @@
     local.get $0
     local.get $1
     i32.ctz
-    local.tee $2
+    local.tee $1
     i32.const 2
     i32.shl
     i32.add
     i32.load offset=4
-    local.tee $1
+    local.tee $2
     i32.eqz
     if
      i32.const 0
@@ -1187,9 +1187,9 @@
      unreachable
     end
     local.get $0
-    local.get $1
-    i32.ctz
     local.get $2
+    i32.ctz
+    local.get $1
     i32.const 4
     i32.shl
     i32.add
@@ -1258,12 +1258,11 @@
   local.tee $0
   i32.eqz
   if
-   memory.size
-   local.tee $0
    i32.const 4
    local.get $1
    i32.load offset=1568
-   local.get $0
+   memory.size
+   local.tee $0
    i32.const 16
    i32.shl
    i32.const 4
@@ -1276,7 +1275,9 @@
    i32.and
    i32.const 16
    i32.shr_u
-   local.tee $2
+   local.set $2
+   local.get $0
+   local.get $2
    local.get $0
    local.get $2
    i32.gt_s

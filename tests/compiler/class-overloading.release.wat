@@ -1163,12 +1163,12 @@
     local.get $0
     local.get $1
     i32.ctz
-    local.tee $2
+    local.tee $1
     i32.const 2
     i32.shl
     i32.add
     i32.load offset=4
-    local.tee $1
+    local.tee $2
     i32.eqz
     if
      i32.const 0
@@ -1179,9 +1179,9 @@
      unreachable
     end
     local.get $0
-    local.get $1
-    i32.ctz
     local.get $2
+    i32.ctz
+    local.get $1
     i32.const 4
     i32.shl
     i32.add
@@ -1250,12 +1250,11 @@
   local.tee $1
   i32.eqz
   if
-   memory.size
-   local.tee $1
    i32.const 4
    local.get $2
    i32.load offset=1568
-   local.get $1
+   memory.size
+   local.tee $1
    i32.const 16
    i32.shl
    i32.const 4
@@ -1268,7 +1267,9 @@
    i32.and
    i32.const 16
    i32.shr_u
-   local.tee $3
+   local.set $3
+   local.get $1
+   local.get $3
    local.get $1
    local.get $3
    i32.gt_s
@@ -2825,31 +2826,27 @@
    local.tee $0
    i32.store
    block $__inlined_func$class-overloading/IA#foo@override$168
-    block $default88
-     block $case189
+    block $case189
+     local.get $0
+     i32.const 8
+     i32.sub
+     i32.load
+     local.tee $0
+     i32.const 11
+     i32.ne
+     if
       local.get $0
-      i32.const 8
-      i32.sub
-      i32.load
-      local.tee $0
-      i32.const 11
-      i32.ne
-      if
-       local.get $0
-       i32.const 13
-       i32.eq
-       br_if $case189
-       br $default88
-      end
-      i32.const 1680
-      global.set $class-overloading/which
-      br $__inlined_func$class-overloading/IA#foo@override$168
+      i32.const 13
+      i32.eq
+      br_if $case189
+      unreachable
      end
-     i32.const 1712
+     i32.const 1680
      global.set $class-overloading/which
      br $__inlined_func$class-overloading/IA#foo@override$168
     end
-    unreachable
+    i32.const 1712
+    global.set $class-overloading/which
    end
    global.get $~lib/memory/__stack_pointer
    global.get $class-overloading/which
@@ -2904,31 +2901,27 @@
    local.tee $0
    i32.store
    block $__inlined_func$class-overloading/IA#foo@override$170
-    block $default91
-     block $case192
+    block $case192
+     local.get $0
+     i32.const 8
+     i32.sub
+     i32.load
+     local.tee $0
+     i32.const 11
+     i32.ne
+     if
       local.get $0
-      i32.const 8
-      i32.sub
-      i32.load
-      local.tee $0
-      i32.const 11
-      i32.ne
-      if
-       local.get $0
-       i32.const 13
-       i32.eq
-       br_if $case192
-       br $default91
-      end
-      i32.const 1680
-      global.set $class-overloading/which
-      br $__inlined_func$class-overloading/IA#foo@override$170
+      i32.const 13
+      i32.eq
+      br_if $case192
+      unreachable
      end
-     i32.const 1712
+     i32.const 1680
      global.set $class-overloading/which
      br $__inlined_func$class-overloading/IA#foo@override$170
     end
-    unreachable
+    i32.const 1712
+    global.set $class-overloading/which
    end
    global.get $~lib/memory/__stack_pointer
    global.get $class-overloading/which
