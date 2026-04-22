@@ -60,12 +60,10 @@ export const {
 
   _BinaryenSizeofLiteral,
   _BinaryenLiteralInt32,
-  _BinaryenLiteralInt64,
   _BinaryenLiteralFloat32,
   _BinaryenLiteralFloat64,
   _BinaryenLiteralVec128,
   _BinaryenLiteralFloat32Bits,
-  _BinaryenLiteralFloat64Bits,
 
   _BinaryenExpressionGetId,
   _BinaryenExpressionGetType,
@@ -211,10 +209,8 @@ export const {
   _BinaryenConst,
   _BinaryenConstGetValueI32,
   _BinaryenConstSetValueI32,
-  _BinaryenConstGetValueI64Low,
-  _BinaryenConstSetValueI64Low,
-  _BinaryenConstGetValueI64High,
-  _BinaryenConstSetValueI64High,
+  _BinaryenConstGetValueI64,
+  _BinaryenConstSetValueI64,
   _BinaryenConstGetValueF32,
   _BinaryenConstSetValueF32,
   _BinaryenConstGetValueF64,
@@ -917,5 +913,41 @@ export const {
   __f64_load
 
 } = binaryen;
+
+// Shims for C-API functions whose Emscripten binding now uses BigInt for i64
+// parameters (built with -sWASM_BIGINT). AssemblyScript passes i64 values as a
+// pair of 32-bit halves, so we pack/unpack BigInt at the boundary.
+
+const LOW_MASK = 0xFFFFFFFFn;
+
+function packI64(lo, hi) {
+  return BigInt.asIntN(64, (BigInt.asIntN(32, BigInt(hi)) << 32n) | (BigInt(lo >>> 0) & LOW_MASK));
+}
+
+export function _BinaryenLiteralInt64(literalOut, lo, hi) {
+  return binaryen._BinaryenLiteralInt64(literalOut, packI64(lo, hi));
+}
+
+export function _BinaryenLiteralFloat64Bits(literalOut, lo, hi) {
+  return binaryen._BinaryenLiteralFloat64Bits(literalOut, packI64(lo, hi));
+}
+
+export function _BinaryenConstGetValueI64Low(expr) {
+  return Number(BigInt.asIntN(32, _BinaryenConstGetValueI64(expr) & LOW_MASK));
+}
+
+export function _BinaryenConstGetValueI64High(expr) {
+  return Number(BigInt.asIntN(32, _BinaryenConstGetValueI64(expr) >> 32n));
+}
+
+export function _BinaryenConstSetValueI64Low(expr, lo) {
+  const cur = _BinaryenConstGetValueI64(expr);
+  _BinaryenConstSetValueI64(expr, packI64(lo, Number(BigInt.asIntN(32, cur >> 32n))));
+}
+
+export function _BinaryenConstSetValueI64High(expr, hi) {
+  const cur = _BinaryenConstGetValueI64(expr);
+  _BinaryenConstSetValueI64(expr, packI64(Number(BigInt.asIntN(32, cur & LOW_MASK)), hi));
+}
 
 export default binaryen;

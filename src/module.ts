@@ -254,6 +254,7 @@ export const enum ExpressionId {
   AtomicWait = 26 /* _BinaryenAtomicWaitId */,
   AtomicNotify = 27 /* _BinaryenAtomicNotifyId */,
   AtomicFence = 28 /* _BinaryenAtomicFenceId */,
+  Pause = 29 /* _BinaryenPauseId */,
   SIMDExtract = 30 /* _BinaryenSIMDExtractId */,
   SIMDReplace = 31 /* _BinaryenSIMDReplaceId */,
   SIMDShuffle = 32 /* _BinaryenSIMDShuffleId */,
@@ -277,6 +278,7 @@ export const enum ExpressionId {
   TableFill = 50 /* _BinaryenTableFillId */,
   TableCopy = 51 /* _BinaryenTableCopyId */,
   TableInit = 52 /* _BinaryenTableInitId */,
+  ElemDrop = 53 /* _BinaryenElemDropId */,
   Try = 54 /* _BinaryenTryId */,
   TryTable = 55 /* _BinaryenTryTableId */,
   Throw = 56 /* _BinaryenThrowId */,
@@ -302,11 +304,15 @@ export const enum ExpressionId {
   ArrayNewFixed = 76 /* _BinaryenArrayNewFixedId */,
   ArrayGet = 77 /* _BinaryenArrayGetId */,
   ArraySet = 78 /* _BinaryenArraySetId */,
+  ArrayLoad = 79 /* _BinaryenArrayLoadId */,
+  ArrayStore = 80 /* _BinaryenArrayStoreId */,
   ArrayLen = 81 /* _BinaryenArrayLenId */,
   ArrayCopy = 82 /* _BinaryenArrayCopyId */,
   ArrayFill = 83 /* _BinaryenArrayFillId */,
   ArrayInitData = 84 /* _BinaryenArrayInitDataId */,
   ArrayInitElem = 85 /* _BinaryenArrayInitElemId */,
+  ArrayRMW = 86 /* _BinaryenArrayRMWId */,
+  ArrayCmpxchg = 87 /* _BinaryenArrayCmpxchgId */,
   RefAs = 88 /* _BinaryenRefAsId */,
   StringNew = 89 /* _BinaryenStringNewId */,
   StringConst = 90 /* _BinaryenStringConstId */,
@@ -314,6 +320,7 @@ export const enum ExpressionId {
   StringEncode = 92 /* _BinaryenStringEncodeId */,
   StringConcat = 93 /* _BinaryenStringConcatId */,
   StringEq = 94 /* _BinaryenStringEqId */,
+  StringTest = 95 /* _BinaryenStringTestId */,
   StringWTF16Get = 96 /* _BinaryenStringWTF16GetId */,
   StringSliceWTF = 97 /* _BinaryenStringSliceWTFId */,
   ContNew = 98 /* _BinaryenContNewId */,
@@ -321,7 +328,9 @@ export const enum ExpressionId {
   Suspend = 100 /* _BinaryenSuspendId */,
   Resume = 101 /* _BinaryenResumeId */,
   ResumeThrow = 102 /* _BinaryenResumeThrowId */,
-  StackSwitch = 103 /* _BinaryenStackSwitchId */
+  StackSwitch = 103 /* _BinaryenStackSwitchId */,
+  StructWait = 104 /* _BinaryenStructWaitId */,
+  StructNotify = 105 /* _BinaryenStructNotifyId */
 }
 
 /** Binaryen external kind constants. */
@@ -331,6 +340,16 @@ export const enum ExternalKind {
   Memory = 2 /* _BinaryenExternalMemory */,
   Global = 3 /* _BinaryenExternalGlobal */,
   Tag = 4 /* _BinaryenExternalTag */
+}
+
+/** Binaryen memory order constants for atomic operations. */
+export const enum MemoryOrder {
+  /** Non-atomic access. */
+  Unordered = 0 /* _BinaryenMemoryOrderUnordered */,
+  /** Sequentially consistent atomic memory operation. */
+  SeqCst = 1 /* _BinaryenMemoryOrderSeqCst */,
+  /** Acquire/Release atomic memory operation; acquire for loads, release for stores. */
+  AcqRel = 2 /* _BinaryenMemoryOrderAcqRel */
 }
 
 /** Binaryen unary operation constants. */
@@ -514,7 +533,7 @@ export const enum UnaryOp {
   AllTrueI64x2 = 83 /* _BinaryenAllTrueVecI64x2 */,
   /** i64x2.bitmask */
   BitmaskI64x2 = 84 /* _BinaryenBitmaskVecI64x2 */,
-  // FIXME FIXME FIXME DONT FORGET TODO: F16 (not in C API yet)
+  // FIXME: f16x8 abs/neg/sqrt/ceil/floor/trunc/nearest (85..91) are in wasm.h but not yet exported via C API
   /** f32x4.abs */
   AbsF32x4 = 92 /* _BinaryenAbsVecF32x4 */,
   /** f32x4.neg */
@@ -603,8 +622,11 @@ export const enum UnaryOp {
   RelaxedTruncF64x2ToI32x4Zero = 134 /* _BinaryenRelaxedTruncZeroSVecF64x2ToVecI32x4 */,
   /** i32x4.relaxed_trunc_f64x2_u_zero */
   RelaxedTruncF64x2ToU32x4Zero = 135 /* _BinaryenRelaxedTruncZeroUVecF64x2ToVecI32x4 */,
+  // FIXME: f16x8 splat/trunc_sat/convert (136..140) are in wasm.h but not yet exported via C API
+  /** f32x4.promote_low_f16x8 */
+  PromoteLowF16x8ToF32x4 = 141 /* _BinaryenPromoteLowVecF16x8ToVecF32x4 */,
 
-  _last = RelaxedTruncF64x2ToU32x4Zero,
+  _last = PromoteLowF16x8ToF32x4,
 
   // Target dependent
 
@@ -847,6 +869,7 @@ export const enum BinaryOp {
   LeI64x2 = 110 /* _BinaryenLeSVecI64x2 */,
   /** i64x2.ge_s */
   GeI64x2 = 111 /* _BinaryenGeSVecI64x2 */,
+  // FIXME: f16x8 compare ops (eq/ne/lt/gt/le/ge = 112..117) are in wasm.h but not yet exported via C API
   /** f32x4.eq */
   EqF32x4 = 118 /* _BinaryenEqVecF32x4 */,
   /** f32x4.ne */
@@ -973,6 +996,7 @@ export const enum BinaryOp {
   ExtmulLowU64x2 = 179 /* _BinaryenExtMulLowUVecI64x2 */,
   /** i64x2.extmul_high_i32x4_u */
   ExtmulHighU64x2 = 180 /* _BinaryenExtMulHighUVecI64x2 */,
+  // FIXME: f16x8 arithmetic ops (add/sub/mul/div/min/max/pmin/pmax = 181..188) are in wasm.h but not yet exported via C API
   /** f32x4.add */
   AddF32x4 = 189 /* _BinaryenAddVecF32x4 */,
   /** f32x4.sub */
@@ -1112,13 +1136,14 @@ export const enum SIMDExtractOp {
   ExtractLaneI16x8 = 2 /* _BinaryenExtractLaneSVecI16x8 */,
   /** i16x8.extract_lane_u */
   ExtractLaneU16x8 = 3 /* _BinaryenExtractLaneUVecI16x8 */,
-  /** i32x4.extract_lane_s */
+  /** i32x4.extract_lane */
   ExtractLaneI32x4 = 4 /* _BinaryenExtractLaneVecI32x4 */,
-  /** i32x4.extract_lane_u */
+  /** i64x2.extract_lane */
   ExtractLaneI64x2 = 5 /* _BinaryenExtractLaneVecI64x2 */,
-  /** i64x2.extract_lane_s */
+  // FIXME: f16x8.extract_lane (= 6) is in wasm.h but not yet exported via C API
+  /** f32x4.extract_lane */
   ExtractLaneF32x4 = 7 /* _BinaryenExtractLaneVecF32x4 */,
-  /** i64x2.extract_lane_u */
+  /** f64x2.extract_lane */
   ExtractLaneF64x2 = 8 /* _BinaryenExtractLaneVecF64x2 */,
 }
 
@@ -1132,6 +1157,7 @@ export const enum SIMDReplaceOp {
   ReplaceLaneI32x4 = 2 /* _BinaryenReplaceLaneVecI32x4 */,
   /** i64x2.replace_lane */
   ReplaceLaneI64x2 = 3 /* _BinaryenReplaceLaneVecI64x2 */,
+  // FIXME: f16x8.replace_lane (= 4) is in wasm.h but not yet exported via C API
   /** f32x4.replace_lane */
   ReplaceLaneF32x4 = 5 /* _BinaryenReplaceLaneVecF32x4 */,
   /** f64x2.replace_lane */
@@ -1236,6 +1262,7 @@ export const enum SIMDTernaryOp {
   RelaxedLaneselectI64x2 = 8 /* _BinaryenLaneselectI64x2 */,
   /** i32x4.relaxed_dot_i8x16_i7x16_add_s */
   RelaxedDotI8x16I7x16AddToI32x4 = 9 /* _BinaryenDotI8x16I7x16AddSToVecI32x4 */,
+  // FIXME: f16x8 madd/nmadd (= 10, 11) are in wasm.h but not yet exported via C API
 }
 
 /** Binaryen RefAs operation constants. */
@@ -1576,10 +1603,11 @@ export class Module {
     ptr: ExpressionRef,
     type: TypeRef,
     offset: Index = 0,
-    name: string = CommonNames.DefaultMemory
+    name: string = CommonNames.DefaultMemory,
+    order: MemoryOrder = MemoryOrder.SeqCst
   ): ExpressionRef {
     let cStr = this.allocStringCached(name);
-    return binaryen._BinaryenAtomicLoad(this.ref, bytes, offset, type, ptr, cStr);
+    return binaryen._BinaryenAtomicLoad(this.ref, bytes, offset, type, ptr, cStr, order);
   }
 
   atomic_store(
@@ -1588,10 +1616,11 @@ export class Module {
     value: ExpressionRef,
     type: TypeRef,
     offset: Index = 0,
-    name: string = CommonNames.DefaultMemory
+    name: string = CommonNames.DefaultMemory,
+    order: MemoryOrder = MemoryOrder.SeqCst
   ): ExpressionRef {
     let cStr = this.allocStringCached(name);
-    return binaryen._BinaryenAtomicStore(this.ref, bytes, offset, ptr, value, type, cStr);
+    return binaryen._BinaryenAtomicStore(this.ref, bytes, offset, ptr, value, type, cStr, order);
   }
 
   atomic_rmw(
@@ -1601,10 +1630,11 @@ export class Module {
     ptr: ExpressionRef,
     value: ExpressionRef,
     type: TypeRef,
-    name: string = CommonNames.DefaultMemory
+    name: string = CommonNames.DefaultMemory,
+    order: MemoryOrder = MemoryOrder.SeqCst
   ): ExpressionRef {
     let cStr = this.allocStringCached(name);
-    return binaryen._BinaryenAtomicRMW(this.ref, op, bytes, offset, ptr, value, type, cStr);
+    return binaryen._BinaryenAtomicRMW(this.ref, op, bytes, offset, ptr, value, type, cStr, order);
   }
 
   atomic_cmpxchg(
@@ -1614,10 +1644,11 @@ export class Module {
     expected: ExpressionRef,
     replacement: ExpressionRef,
     type: TypeRef,
-    name: string = CommonNames.DefaultMemory
+    name: string = CommonNames.DefaultMemory,
+    order: MemoryOrder = MemoryOrder.SeqCst
   ): ExpressionRef {
     let cStr = this.allocStringCached(name);
-    return binaryen._BinaryenAtomicCmpxchg(this.ref, bytes, offset, ptr, expected, replacement, type, cStr);
+    return binaryen._BinaryenAtomicCmpxchg(this.ref, bytes, offset, ptr, expected, replacement, type, cStr, order);
   }
 
   atomic_wait(
