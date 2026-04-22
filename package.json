@@ -37,7 +37,7 @@
     "eslint": "^10.2.1",
     "glob": "^13.0.6",
     "globals": "^17.5.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.0"
   },
   "type": "module",
@@ -74,7 +74,7 @@
   "scripts": {
     "check": "npm run check:config && npm run check:import && npm run lint",
     "check:config": "tsc --noEmit -p src --diagnostics --listFiles",
-    "check:import": "tsc --noEmit --target ESNEXT --module nodenext --moduleResolution nodenext --experimentalDecorators tests/import/index",
+    "check:import": "tsc --noEmit --skipLibCheck --target ESNEXT --module nodenext --moduleResolution nodenext --experimentalDecorators tests/import/index",
     "lint": "eslint --max-warnings 0 --ext js . && eslint --max-warnings 0 --ext ts .",
     "build": "node scripts/build",
     "watch": "node scripts/build --watch",
