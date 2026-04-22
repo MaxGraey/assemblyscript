@@ -918,10 +918,8 @@ export const {
 // parameters (built with -sWASM_BIGINT). AssemblyScript passes i64 values as a
 // pair of 32-bit halves, so we pack/unpack BigInt at the boundary.
 
-const LOW_MASK = 0xFFFFFFFFn;
-
 function packI64(lo, hi) {
-  return BigInt.asIntN(64, (BigInt.asIntN(32, BigInt(hi)) << 32n) | (BigInt(lo >>> 0) & LOW_MASK));
+  return (BigInt(hi | 0) << 32n) | BigInt(lo >>> 0);
 }
 
 export function _BinaryenLiteralInt64(literalOut, lo, hi) {
@@ -933,21 +931,21 @@ export function _BinaryenLiteralFloat64Bits(literalOut, lo, hi) {
 }
 
 export function _BinaryenConstGetValueI64Low(expr) {
-  return Number(BigInt.asIntN(32, _BinaryenConstGetValueI64(expr) & LOW_MASK));
+  return Number(_BinaryenConstGetValueI64(expr) & 0xFFFFFFFFn) | 0;
 }
 
 export function _BinaryenConstGetValueI64High(expr) {
-  return Number(BigInt.asIntN(32, _BinaryenConstGetValueI64(expr) >> 32n));
+  return Number(_BinaryenConstGetValueI64(expr) >> 32n) | 0;
 }
 
 export function _BinaryenConstSetValueI64Low(expr, lo) {
   const cur = _BinaryenConstGetValueI64(expr);
-  _BinaryenConstSetValueI64(expr, packI64(lo, Number(BigInt.asIntN(32, cur >> 32n))));
+  _BinaryenConstSetValueI64(expr, packI64(lo, Number(cur >> 32n) | 0));
 }
 
 export function _BinaryenConstSetValueI64High(expr, hi) {
   const cur = _BinaryenConstGetValueI64(expr);
-  _BinaryenConstSetValueI64(expr, packI64(Number(BigInt.asIntN(32, cur & LOW_MASK)), hi));
+  _BinaryenConstSetValueI64(expr, packI64(Number(cur & 0xFFFFFFFFn) | 0, hi));
 }
 
 export default binaryen;
