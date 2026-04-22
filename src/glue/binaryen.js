@@ -917,28 +917,28 @@ export const {
 // parameters (built with -sWASM_BIGINT). In portable/JS mode AssemblyScript
 // represents i64 as Long, so we convert between Long and BigInt here.
 
-function toBigInt(value) {
-  return (BigInt(value.high | 0) << 32n) | BigInt(value.low >>> 0);
+function toBigInt(long) {
+  return (BigInt(long.high | 0) << 32n) | BigInt(long.low >>> 0);
 }
 
-function toLong(value) {
-  return Long.fromBits(Number(value & 0xFFFFFFFFn) | 0, Number(value >> 32n) | 0);
+function toLong(bign) {
+  return Long.fromBits(Number(bign & 0xFFFFFFFFn) | 0, Number(bign >> 32n) | 0);
 }
 
-export function _BinaryenLiteralInt64(literalOut, value) {
-  return binaryen._BinaryenLiteralInt64(literalOut, toBigInt(value));
+export function _BinaryenLiteralInt64(lit, val) {
+  return binaryen._BinaryenLiteralInt64(lit, toBigInt(val));
 }
 
-export function _BinaryenLiteralFloat64Bits(literalOut, value) {
-  return binaryen._BinaryenLiteralFloat64Bits(literalOut, toBigInt(value));
+export function _BinaryenLiteralFloat64Bits(lit, val) {
+  return binaryen._BinaryenLiteralFloat64Bits(lit, toBigInt(val));
 }
 
 export function _BinaryenConstGetValueI64(expr) {
   return toLong(binaryen._BinaryenConstGetValueI64(expr));
 }
 
-export function _BinaryenConstSetValueI64(expr, value) {
-  binaryen._BinaryenConstSetValueI64(expr, toBigInt(value));
+export function _BinaryenConstSetValueI64(expr, val) {
+  binaryen._BinaryenConstSetValueI64(expr, toBigInt(val));
 }
 
 export default binaryen;
