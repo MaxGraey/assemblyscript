@@ -96,12 +96,12 @@ export declare function _BinaryenModuleDispose(module: ModuleRef): void;
 
 export declare function _BinaryenSizeofLiteral(): usize;
 export declare function _BinaryenLiteralInt32(literalOut: LiteralRef, x: i32): void;
-export declare function _BinaryenLiteralInt64(literalOut: LiteralRef, x: i32, y: i32): void;
+export declare function _BinaryenLiteralInt64(literalOut: LiteralRef, value: i64): void;
 export declare function _BinaryenLiteralFloat32(literalOut: LiteralRef, x: f32): void;
 export declare function _BinaryenLiteralFloat64(literalOut: LiteralRef, x: f64): void;
 export declare function _BinaryenLiteralVec128(literalOut: LiteralRef, x: ArrayRef<u8>): void;
 export declare function _BinaryenLiteralFloat32Bits(literalOut: LiteralRef, x: i32): void;
-export declare function _BinaryenLiteralFloat64Bits(literalOut: LiteralRef, x: i32, y: i32): void;
+export declare function _BinaryenLiteralFloat64Bits(literalOut: LiteralRef, value: i64): void;
 
 export declare function _BinaryenExpressionGetId(expr: ExpressionRef): ExpressionId;
 export declare function _BinaryenExpressionGetType(expr: ExpressionRef): TypeRef;
@@ -252,10 +252,8 @@ export declare function _BinaryenAtomicStore(module: ModuleRef, bytes: Index, of
 export declare function _BinaryenConst(module: ModuleRef, value: LiteralRef): ExpressionRef;
 export declare function _BinaryenConstGetValueI32(expr: ExpressionRef): i32;
 export declare function _BinaryenConstSetValueI32(expr: ExpressionRef, value: i32): void;
-export declare function _BinaryenConstGetValueI64Low(expr: ExpressionRef): i32;
-export declare function _BinaryenConstSetValueI64Low(expr: ExpressionRef, value: i32): void;
-export declare function _BinaryenConstGetValueI64High(expr: ExpressionRef): i32;
-export declare function _BinaryenConstSetValueI64High(expr: ExpressionRef, value: i32): void;
+export declare function _BinaryenConstGetValueI64(expr: ExpressionRef): i64;
+export declare function _BinaryenConstSetValueI64(expr: ExpressionRef, value: i64): void;
 export declare function _BinaryenConstGetValueF32(expr: ExpressionRef): f32;
 export declare function _BinaryenConstSetValueF32(expr: ExpressionRef, value: f32): void;
 export declare function _BinaryenConstGetValueF64(expr: ExpressionRef): f64;

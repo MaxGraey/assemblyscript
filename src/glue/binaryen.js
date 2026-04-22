@@ -4,6 +4,7 @@
  */
 
 import binaryen from "../../lib/binaryen.js";
+import Long from "long";
 
 export const {
   _BinaryenTypeCreate,
@@ -209,8 +210,6 @@ export const {
   _BinaryenConst,
   _BinaryenConstGetValueI32,
   _BinaryenConstSetValueI32,
-  _BinaryenConstGetValueI64,
-  _BinaryenConstSetValueI64,
   _BinaryenConstGetValueF32,
   _BinaryenConstSetValueF32,
   _BinaryenConstGetValueF64,
@@ -915,37 +914,31 @@ export const {
 } = binaryen;
 
 // Shims for C-API functions whose Emscripten binding now uses BigInt for i64
-// parameters (built with -sWASM_BIGINT). AssemblyScript passes i64 values as a
-// pair of 32-bit halves, so we pack/unpack BigInt at the boundary.
+// parameters (built with -sWASM_BIGINT). In portable/JS mode AssemblyScript
+// represents i64 as Long, so we convert between Long and BigInt here.
 
-function packI64(lo, hi) {
-  return (BigInt(hi | 0) << 32n) | BigInt(lo >>> 0);
+function longToBigInt(value) {
+  return (BigInt(value.high | 0) << 32n) | BigInt(value.low >>> 0);
 }
 
-export function _BinaryenLiteralInt64(literalOut, lo, hi) {
-  return binaryen._BinaryenLiteralInt64(literalOut, packI64(lo, hi));
+function bigIntToLong(value) {
+  return Long.fromBits(Number(value & 0xFFFFFFFFn) | 0, Number(value >> 32n) | 0);
 }
 
-export function _BinaryenLiteralFloat64Bits(literalOut, lo, hi) {
-  return binaryen._BinaryenLiteralFloat64Bits(literalOut, packI64(lo, hi));
+export function _BinaryenLiteralInt64(literalOut, value) {
+  return binaryen._BinaryenLiteralInt64(literalOut, longToBigInt(value));
 }
 
-export function _BinaryenConstGetValueI64Low(expr) {
-  return Number(_BinaryenConstGetValueI64(expr) & 0xFFFFFFFFn) | 0;
+export function _BinaryenLiteralFloat64Bits(literalOut, value) {
+  return binaryen._BinaryenLiteralFloat64Bits(literalOut, longToBigInt(value));
 }
 
-export function _BinaryenConstGetValueI64High(expr) {
-  return Number(_BinaryenConstGetValueI64(expr) >> 32n) | 0;
+export function _BinaryenConstGetValueI64(expr) {
+  return bigIntToLong(binaryen._BinaryenConstGetValueI64(expr));
 }
 
-export function _BinaryenConstSetValueI64Low(expr, lo) {
-  const cur = _BinaryenConstGetValueI64(expr);
-  _BinaryenConstSetValueI64(expr, packI64(lo, Number(cur >> 32n) | 0));
-}
-
-export function _BinaryenConstSetValueI64High(expr, hi) {
-  const cur = _BinaryenConstGetValueI64(expr);
-  _BinaryenConstSetValueI64(expr, packI64(Number(cur & 0xFFFFFFFFn) | 0, hi));
+export function _BinaryenConstSetValueI64(expr, value) {
+  binaryen._BinaryenConstSetValueI64(expr, longToBigInt(value));
 }
 
 export default binaryen;

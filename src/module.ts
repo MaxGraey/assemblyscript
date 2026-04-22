@@ -1372,7 +1372,7 @@ export class Module {
 
   i64(valueLow: i32, valueHigh: i32 = 0): ExpressionRef {
     let out = this.lit;
-    binaryen._BinaryenLiteralInt64(out, valueLow, valueHigh);
+    binaryen._BinaryenLiteralInt64(out, i64_new(valueLow, valueHigh));
     return binaryen._BinaryenConst(this.ref, out);
   }
 
@@ -3058,11 +3058,11 @@ export function getConstValueI32(expr: ExpressionRef): i32 {
 }
 
 export function getConstValueI64Low(expr: ExpressionRef): i32 {
-  return binaryen._BinaryenConstGetValueI64Low(expr);
+  return i64_low(binaryen._BinaryenConstGetValueI64(expr));
 }
 
 export function getConstValueI64High(expr: ExpressionRef): i32 {
-  return binaryen._BinaryenConstGetValueI64High(expr);
+  return i64_high(binaryen._BinaryenConstGetValueI64(expr));
 }
 
 export function getConstValueInteger(expr: ExpressionRef, isWasm64: bool): i64 {
