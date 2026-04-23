@@ -2498,6 +2498,14 @@ export class Module {
     binaryen._BinaryenSetDebugInfo(on);
   }
 
+  getTrapsNeverHappen(): bool {
+    return binaryen._BinaryenGetTrapsNeverHappen();
+  }
+
+  setTrapsNeverHappen(on: bool): void {
+    binaryen._BinaryenSetTrapsNeverHappen(on);
+  }
+
   getClosedWorld(): bool {
     return binaryen._BinaryenGetClosedWorld();
   }
