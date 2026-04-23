@@ -10592,8 +10592,6 @@
  (func $~lib/util/number/itoa_buffered<u64> (param $0 i32) (param $1 i64) (result i32)
   (local $2 i32)
   (local $3 i32)
-  local.get $0
-  local.set $2
   local.get $1
   i64.const 10
   i64.lt_u
@@ -10606,6 +10604,8 @@
    i32.const 1
    return
   end
+  local.get $0
+  local.set $2
   local.get $1
   i64.const 4294967295
   i64.le_u
