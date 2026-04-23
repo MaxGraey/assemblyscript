@@ -2642,12 +2642,13 @@ export class Module {
     // Implicitly run costly non-LLVM optimizations on -O3 or -Oz
     if (optimizeLevel >= 3 || shrinkLevel >= 2) optimizeLevel = 4;
 
+    this.clearPassArguments();
+
     this.setOptimizeLevel(optimizeLevel);
     this.setShrinkLevel(shrinkLevel);
     this.setDebugInfo(debugInfo);
     this.setZeroFilledMemory(zeroFilledMemory);
     this.setFastMath(true);
-    this.clearPassArguments();
 
     // OptimizationOptions#parse in src/tools/optimization-options.h
     const stackIR = optimizeLevel >= 2 || shrinkLevel >= 1;
