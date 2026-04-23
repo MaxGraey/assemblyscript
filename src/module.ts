@@ -2660,7 +2660,7 @@ export class Module {
       this.setAlwaysInlineMaxSize(12);
       this.setFlexibleInlineMaxSize(70);
       this.setOneCallerInlineMaxSize(200);
-      this.setAllowInliningFunctionsWithLoops(optimizeLevel >= 3);
+      this.setAllowInliningFunctionsWithLoops(true);
     } else {
       this.setAlwaysInlineMaxSize(
         optimizeLevel <= 1 || shrinkLevel >= 2
@@ -2687,9 +2687,10 @@ export class Module {
       }
 
       // --- PassRunner::addDefaultFunctionOptimizationPasses ---
-      if (optimizeLevel >= 2) {
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
         passes.push("inlining");
         passes.push("simplify-globals-optimizing");
+        passes.push("generate-global-effects");
       }
       if (optimizeLevel >= 3 || shrinkLevel >= 1) {
         passes.push("rse");
@@ -2703,12 +2704,6 @@ export class Module {
         passes.push("precompute-propagate");
         passes.push("simplify-globals-optimizing");
         passes.push("dae-optimizing");
-      }
-      if (this.getFeatures() & FeatureFlags.MultiValue) {
-        // Optimize tuples before local opts (as splitting tuples can help local
-        // opts), but also not too early, as we want to be after
-        // optimize-instructions at least (which can remove tuple-related things).
-        passes.push("tuple-optimization");
       }
       if (optimizeLevel >= 3) {
         passes.push("simplify-locals-nostructure");
@@ -2729,10 +2724,18 @@ export class Module {
       passes.push("remove-unused-brs");
       passes.push("remove-unused-names");
       passes.push("merge-blocks");
+      if (this.getFeatures() & FeatureFlags.MultiValue) {
+        // Optimize tuples before local opts (as splitting tuples can help local
+        // opts), but also not too early, as we want to be after
+        // optimize-instructions at least (which can remove tuple-related things).
+        passes.push("tuple-optimization");
+      }
       if (optimizeLevel >= 3 || shrinkLevel >= 2) {
         passes.push("inlining");
         passes.push("precompute-propagate");
         passes.push("simplify-globals-optimizing");
+      } else if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("precompute-propagate");
       } else {
         passes.push("precompute");
       }
@@ -2754,7 +2757,7 @@ export class Module {
         passes.push("rse");
         passes.push("vacuum");
       }
-      if (optimizeLevel >= 3 || shrinkLevel >= 1) {
+      if (shrinkLevel >= 1) {
         passes.push("merge-locals");
         passes.push("vacuum");
       }
@@ -2772,7 +2775,6 @@ export class Module {
       // --- PassRunner::addDefaultGlobalOptimizationPostPasses ---
 
       if (optimizeLevel >= 2 || shrinkLevel >= 1) {
-        passes.push("generate-global-effects");
         passes.push("simplify-globals-optimizing");
         passes.push("dae-optimizing");
       }
@@ -2860,16 +2862,21 @@ export class Module {
         passes.push("simplify-globals-optimizing");
         passes.push("reorder-globals");
         passes.push("reorder-functions");
-        passes.push("remove-unused-brs");
         passes.push("optimize-instructions");
       }
       // clean up
-      passes.push("duplicate-function-elimination");
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("duplicate-function-elimination");
+      }
       if (shrinkLevel >= 2) {
         passes.push("merge-similar-functions");
       }
       passes.push("memory-packing");
       passes.push("remove-unused-module-elements");
+      if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        // release the global-effects cache populated earlier in post-passes.
+        passes.push("discard-global-effects");
+      }
 
       this.runPasses(passes);
     }
