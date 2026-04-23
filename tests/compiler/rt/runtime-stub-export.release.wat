@@ -1,9 +1,9 @@
 (module
  (type $0 (func))
  (type $1 (func (param i32 i32 i32 i32)))
- (type $2 (func (param i32 i32) (result i32)))
+ (type $2 (func (param i32)))
  (type $3 (func (param i32) (result i32)))
- (type $4 (func (param i32)))
+ (type $4 (func (param i32 i32) (result i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (global $~lib/rt/stub/offset (mut i32) (i32.const 0))
  (global $~lib/rt/__rtti_base i32 (i32.const 1168))
@@ -20,6 +20,15 @@
  (export "__rtti_base" (global $~lib/rt/__rtti_base))
  (export "memory" (memory $0))
  (start $~start)
+ (func $~start
+  i32.const 1196
+  global.set $~lib/rt/stub/offset
+ )
+ (func $~lib/rt/stub/__unpin (param $0 i32)
+ )
+ (func $~lib/rt/stub/__pin (param $0 i32) (result i32)
+  local.get $0
+ )
  (func $~lib/rt/stub/__new (param $0 i32) (param $1 i32) (result i32)
   (local $2 i32)
   (local $3 i32)
@@ -128,15 +137,6 @@
   i32.const 16
   i32.add
  )
- (func $~lib/rt/stub/__pin (param $0 i32) (result i32)
-  local.get $0
- )
- (func $~lib/rt/stub/__unpin (param $0 i32)
- )
  (func $~lib/rt/stub/__collect
- )
- (func $~start
-  i32.const 1196
-  global.set $~lib/rt/stub/offset
  )
 )

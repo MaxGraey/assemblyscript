@@ -2602,6 +2602,10 @@ export class Module {
     binaryen._BinaryenSetAllowInliningFunctionsWithLoops(enabled);
   }
 
+  setPartialInliningIfs(value: i32): void {
+    this.setPassArgument("partial-inlining-ifs", value.toString());
+  }
+
   // meta (module)
 
   getFeatures(): FeatureFlags {
@@ -2666,6 +2670,7 @@ export class Module {
       this.setOneCallerInlineMaxSize(80);
       this.setAllowInliningFunctionsWithLoops(false);
     }
+    this.setPartialInliningIfs(optimizeLevel >= 2 ? 4 : 0);
 
     // Pass order here differs substantially from Binaryen's defaults
     // see: Binaryen/src/pass.cpp
@@ -2676,10 +2681,12 @@ export class Module {
 
       passes.push("duplicate-function-elimination");
       passes.push("remove-unused-module-elements"); // +
+      if (optimizeLevel >= 2) {
+        passes.push("once-reduction");
+      }
 
       // --- PassRunner::addDefaultFunctionOptimizationPasses ---
       if (optimizeLevel >= 2) {
-        passes.push("once-reduction");
         passes.push("inlining");
         passes.push("simplify-globals-optimizing");
       }
@@ -2694,7 +2701,6 @@ export class Module {
         passes.push("merge-blocks");
         passes.push("precompute-propagate");
         passes.push("simplify-globals-optimizing");
-        passes.push("gufa-optimizing");
         passes.push("dae-optimizing");
       }
       if (this.getFeatures() & FeatureFlags.MultiValue) {
@@ -2709,16 +2715,19 @@ export class Module {
         passes.push("vacuum");
         passes.push("simplify-locals-notee-nostructure");
         passes.push("vacuum");
+        passes.push("local-cse");
         passes.push("licm");
         passes.push("merge-locals");
         passes.push("reorder-locals");
       }
       passes.push("optimize-instructions");
-      if (optimizeLevel >= 3 || shrinkLevel >= 1) {
-        passes.push("dce");
+      if (optimizeLevel >= 2) {
+        passes.push("avoid-reinterprets");
       }
+      passes.push("dce");
       passes.push("remove-unused-brs");
       passes.push("remove-unused-names");
+      passes.push("merge-blocks");
       if (optimizeLevel >= 3 || shrinkLevel >= 2) {
         passes.push("inlining");
         passes.push("precompute-propagate");
@@ -2762,6 +2771,7 @@ export class Module {
       // --- PassRunner::addDefaultGlobalOptimizationPostPasses ---
 
       if (optimizeLevel >= 2 || shrinkLevel >= 1) {
+        passes.push("generate-global-effects");
         passes.push("simplify-globals-optimizing");
         passes.push("dae-optimizing");
       }
@@ -2797,6 +2807,10 @@ export class Module {
       }
       passes.push("directize"); // replace indirect with direct calls
       passes.push("dae-optimizing"); // reduce arity
+      if (optimizeLevel >= 3 || shrinkLevel >= 1) {
+        // whole-program value-flow analysis
+        passes.push("gufa-optimizing");
+      }
       passes.push("inlining-optimizing"); // and inline if possible
       if (optimizeLevel >= 2 || shrinkLevel >= 1) {
         passes.push("code-folding");
@@ -2844,6 +2858,7 @@ export class Module {
 
         passes.push("simplify-globals-optimizing");
         passes.push("reorder-globals");
+        passes.push("reorder-functions");
         passes.push("remove-unused-brs");
         passes.push("optimize-instructions");
       }

@@ -13,9 +13,6 @@
  (elem $0 (i32.const 1) $class-static-function/Example.staticFunc)
  (export "memory" (memory $0))
  (start $~start)
- (func $class-static-function/Example.staticFunc (result i32)
-  i32.const 42
- )
  (func $~start
   global.get $~lib/memory/__stack_pointer
   i32.const 4
@@ -42,9 +39,21 @@
   i32.load
   call_indirect (type $0)
   drop
+  i32.const 0
+  if
+   i32.const 0
+   i32.const 1088
+   i32.const 11
+   i32.const 1
+   call $~lib/builtins/abort
+   unreachable
+  end
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.add
   global.set $~lib/memory/__stack_pointer
+ )
+ (func $class-static-function/Example.staticFunc (result i32)
+  i32.const 42
  )
 )
