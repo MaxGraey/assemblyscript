@@ -1740,15 +1740,6 @@
    i32.load
    call_indirect (type $5)
    drop
-   i32.const 0
-   if
-    i32.const 0
-    i32.const 1056
-    i32.const 69
-    i32.const 3
-    call $~lib/builtins/abort
-    unreachable
-   end
    global.get $~lib/memory/__stack_pointer
    i32.const 123
    i32.store

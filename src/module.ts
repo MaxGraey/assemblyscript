@@ -2860,11 +2860,12 @@ export class Module {
         }
 
         passes.push("simplify-globals-optimizing");
-        passes.push("reorder-globals");
-        passes.push("reorder-functions");
         passes.push("remove-unused-brs");
         passes.push("optimize-instructions");
+        passes.push("vacuum");
       }
+      passes.push("reorder-globals");
+      passes.push("reorder-functions");
       // clean up
       if (optimizeLevel >= 2 || shrinkLevel >= 1) {
         passes.push("duplicate-function-elimination");

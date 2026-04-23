@@ -1,7 +1,7 @@
 (module
  (type $0 (func (result i32)))
- (type $1 (func (param i32 i32 i32 i32)))
- (type $2 (func))
+ (type $1 (func))
+ (type $2 (func (param i32 i32 i32 i32)))
  (import "env" "abort" (func $~lib/builtins/abort (param i32 i32 i32 i32)))
  (global $~lib/memory/__stack_pointer (mut i32) (i32.const 33916))
  (memory $0 1)
@@ -39,15 +39,6 @@
   i32.load
   call_indirect (type $0)
   drop
-  i32.const 0
-  if
-   i32.const 0
-   i32.const 1088
-   i32.const 11
-   i32.const 1
-   call $~lib/builtins/abort
-   unreachable
-  end
   global.get $~lib/memory/__stack_pointer
   i32.const 4
   i32.add
