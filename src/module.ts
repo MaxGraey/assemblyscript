@@ -218,9 +218,10 @@ export const enum FeatureFlags {
   BulkMemoryOpt = 524288 /* _BinaryenFeatureBulkMemoryOpt */,
   CallIndirectOverlong = 1048576 /* _BinaryenFeatureCallIndirectOverlong */,
   RelaxedAtomics = 4194304 /* _BinaryenFeatureRelaxedAtomics */,
-  Multibyte = 16777216 /* _BinaryenFeatureMultibyte */,
   CustomPageSizes = 8388608 /* _BinaryenFeatureCustomPageSizes */,
-  All = 33554431 /* _BinaryenFeatureAll */
+  Multibyte = 16777216 /* _BinaryenFeatureMultibyte */,
+  WideArithmetic = 33554432 /* _BinaryenFeatureWideArithmetic */,
+  All = 67108863 /* _BinaryenFeatureAll */
 }
 
 /** Binaryen expression id constants. See wasm-delegations.def in Binaryen. */
@@ -625,6 +626,10 @@ export const enum UnaryOp {
   // FIXME: f16x8 splat/trunc_sat/convert (136..140) are in wasm.h but not yet exported via C API
   /** f32x4.promote_low_f16x8 */
   PromoteLowF16x8ToF32x4 = 141 /* _BinaryenPromoteLowVecF16x8ToVecF32x4 */,
+  /** f16x8.demote_f32x4_zero */
+  // DemoteZeroF32x4ToF16x8 = 142 /* TODO_BinaryenDemoteZeroVecF32x4ToVecF16x8 */,
+  /** f16x8.demote_f64x2_zero */
+  // DemoteZeroF64x2ToF16x8 = 143 /* TODO_BinaryeDemoteZeroVecF64x2ToVecF16x8 */,
 
   _last = PromoteLowF16x8ToF32x4,
 
