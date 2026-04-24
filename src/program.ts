@@ -1086,6 +1086,8 @@ export class Program extends DiagnosticEmitter {
       i64_new(options.hasFeature(Feature.ExtendedConst) ? 1 : 0, 0));
     this.registerConstantInteger(CommonNames.ASC_FEATURE_STRINGREF, Type.bool,
       i64_new(options.hasFeature(Feature.Strings) ? 1 : 0, 0));
+    this.registerConstantInteger(CommonNames.ASC_FEATURE_SHARED_EVERYTHING, Type.bool,
+      i64_new(options.hasFeature(Feature.Strings) ? 1 : 0, 0));
 
     // remember deferred elements
     let queuedImports = new Array<QueuedImport>();
@@ -1289,7 +1291,9 @@ export class Program extends DiagnosticEmitter {
     this.registerWrapperClass(Type.bool, CommonNames.Bool);
     this.registerWrapperClass(Type.f32, CommonNames.F32);
     this.registerWrapperClass(Type.f64, CommonNames.F64);
-    if (options.hasFeature(Feature.Simd)) this.registerWrapperClass(Type.v128, CommonNames.V128);
+    if (options.hasFeature(Feature.Simd)) {
+      this.registerWrapperClass(Type.v128, CommonNames.V128);
+    }
     if (options.hasFeature(Feature.ReferenceTypes)) {
       this.registerWrapperClass(Type.func, CommonNames.RefFunc);
       this.registerWrapperClass(Type.extern, CommonNames.RefExtern);

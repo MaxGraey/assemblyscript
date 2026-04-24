@@ -325,6 +325,8 @@ export class Options {
   /** Sets whether a feature is enabled. */
   setFeature(feature: Feature, on: bool = true): void {
     if (on) {
+      // Enabling Shared Everything also enables Threads and GC
+      if (feature & Feature.SharedEverything) feature |= Feature.Threads | Feature.GC;
       // Enabling Stringref also enables GC
       if (feature & Feature.Strings) feature |= Feature.GC;
       // Enabling GC also enables Reference Types
@@ -339,6 +341,8 @@ export class Options {
       if (feature & Feature.GC) feature |= Feature.Strings;
       // Disabling SIMD also disables Relaxed SIMD
       if (feature & Feature.Simd) feature |= Feature.RelaxedSimd;
+      // Disabling Threads or GC also disables Shared Everything
+      if (feature & (Feature.Threads | Feature.GC)) feature |= Feature.SharedEverything;
       this.features &= ~feature;
     }
   }
@@ -516,6 +520,7 @@ export class Compiler extends DiagnosticEmitter {
     if (options.hasFeature(Feature.RelaxedSimd)) featureFlags |= FeatureFlags.RelaxedSIMD;
     if (options.hasFeature(Feature.ExtendedConst)) featureFlags |= FeatureFlags.ExtendedConst;
     if (options.hasFeature(Feature.Strings)) featureFlags |= FeatureFlags.Strings;
+    if (options.hasFeature(Feature.SharedEverything)) featureFlags |= FeatureFlags.SharedEverything;
     module.setFeatures(featureFlags);
 
     // set up the main start function
