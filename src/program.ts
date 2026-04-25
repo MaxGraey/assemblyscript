@@ -442,6 +442,9 @@ export class Program extends DiagnosticEmitter {
     let nativeFile = new File(this, Source.native);
     this.nativeFile = nativeFile;
     this.filesByName.set(nativeFile.internalName, nativeFile);
+
+    // TODO: temporary workaround. remove after multi-value support is finished
+    this.parser.options = this.options;
   }
 
   /** Module instance. */
@@ -1561,6 +1564,16 @@ export class Program extends DiagnosticEmitter {
     ) {
       let thisMethod = <FunctionPrototype>thisMember;
       let baseMethod = <FunctionPrototype>baseMember;
+      let thisIsGeneric = thisMethod.is(CommonFlags.Generic);
+      let baseIsGeneric = baseMethod.is(CommonFlags.Generic);
+      if (thisIsGeneric != baseIsGeneric) {
+        this.errorRelated(
+          DiagnosticCode.Cannot_override_generic_method_0_with_a_non_generic_method_or_vice_versa,
+          thisMethod.identifierNode.range, baseMethod.identifierNode.range,
+          thisMethod.name
+        );
+        return;
+      }
       if (!thisMethod.visibilityEquals(baseMethod)) {
         this.errorRelated(
           DiagnosticCode.Overload_signatures_must_all_be_public_private_or_protected,
